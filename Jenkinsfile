@@ -59,9 +59,18 @@ pipeline{
                 sh "trivy image aseemakram19/starbucks:latest > trivyimage.txt" 
             }
         }
-        stage('App Deploy to Docker container'){
-            steps{
-                sh 'docker run -d --name starbucks -p 3000:3000 aseemakram19/starbucks:latest'
+        stage('App Deploy to Docker container') {
+    steps {
+        sh '''
+        echo "Stopping old container if exists..."
+        docker stop starbucks || true
+
+        echo "Removing old container if exists..."
+        docker rm starbucks || true
+
+        echo "Starting new container..."
+        docker run -d --restart unless-stopped --name starbucks -p 3000:3000 swapniluphade45/starbucks:latest
+        '''
             }
         }
 
